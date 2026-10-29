@@ -49,7 +49,7 @@ low-altitude-logistics-platform/
 ## 📌 说明
 
 - 本项目为比赛演示原型，部分交互（如批量下单、理赔提交）以提示框形式模拟后端响应
-- 后端服务见姊妹仓库：[low-altitude-logistics-server](https://github.com/Mommmmmo/low-altitude-logistics-server)
+- 后端服务见仓库：[low-altitude-logistics-server](https://github.com/Mommmmmo/low-altitude-logistics-server)
 
 ---
 
