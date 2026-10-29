@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>贵州枢纽 · 低空智慧物流平台</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f7;
+      --surface-2: #fafafc;
+      --border: #e5e5e7;
+      --primary: #3b82f6;
+      --primary-light: #eff6ff;
+      --text: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --success: #34c759;
+      --warning: #ff9500;
+      --danger: #ff3b30;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+      --shadow-card: 0 4px 20px rgba(0,0,0,0.04);
+      --header-h: 64px;
+      --sidebar-w: 220px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    /* Topbar */
+    .topbar {
+      height: var(--header-h);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--primary), #60a5fa);
+      border-radius: 8px;
+      display: grid; place-items: center;
+    }
+    .logo::after {
+      content: "";
+      width: 16px; height: 16px;
+      background: #fff;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+    .brand h1 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
+    .brand h1 span { font-weight: 400; color: var(--text-secondary); margin-left: 6px; }
+
+    .role-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+    }
+    .role-tabs button {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-secondary);
+      transition: all .2s;
+      font-weight: 500;
+    }
+    .role-tabs button:hover { color: var(--text); }
+    .role-tabs button.active { background: var(--bg); color: var(--primary); box-shadow: var(--shadow); }
+
+    .actions { display: flex; align-items: center; gap: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s;
+      font-weight: 500;
+    }
+    .btn:hover { border-color: #d1d1d6; background: var(--surface); }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-ghost { border-color: transparent; background: transparent; }
+    .user {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--surface);
+      display: grid; place-items: center;
+      font-size: 12px; font-weight: 600; color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      height: calc(100% - var(--header-h));
+      margin-top: var(--header-h);
+    }
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface-2);
+      border-right: 1px solid var(--border);
+      padding: 16px 12px;
+      display: flex; flex-direction: column; gap: 4px;
+      overflow-y: auto;
+    }
+    .sidebar-label {
+      font-size: 11px; font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 12px 8px;
+    }
+    .menu-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all .15s;
+      font-weight: 500;
+    }
+    .menu-item:hover { background: var(--surface); color: var(--text); }
+    .menu-item.active { background: var(--primary-light); color: var(--primary); }
+    .menu-icon { width: 18px; height: 18px; }
+
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+
+    /* Cards */
+    .page-title { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+    .page-sub { color: var(--text-secondary); margin: 0 0 20px; }
+    .grid { display: grid; gap: 16px; }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 1200px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .card-title { font-size: 15px; font-weight: 600; margin: 0; }
+    .card-action { font-size: 13px; color: var(--primary); cursor: pointer; }
+
+    .kpi { display: flex; flex-direction: column; gap: 6px; }
+    .kpi-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+    .kpi-label { color: var(--text-secondary); font-size: 13px; }
+    .kpi-change { font-size: 12px; color: var(--success); font-weight: 500; }
+    .kpi-change.down { color: var(--danger); }
+
+    /* Map */
+    .map-card {
+      min-height: 420px;
+      position: relative;
+      overflow: hidden;
+    }
+    .map-container {
+      width: 100%; height: 100%; min-height: 360px;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .mock-map {
+      width: 100%; height: 100%; min-height: 360px;
+      background:
+        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      position: relative;
+    }
+    .mock-map::before {
+      content: "地图模块 · 输入高德 Web 端 Key 后启用真实地图";
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      color: var(--text-secondary); font-size: 13px;
+      background: rgba(255,255,255,0.9); padding: 8px 14px; border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .map-marker {
+      position: absolute; width: 14px; height: 14px;
+      background: var(--primary); border-radius: 50%;
+      border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .map-marker::after {
+      content: attr(data-label);
+      position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+      white-space: nowrap;
+      background: rgba(0,0,0,0.75); color: #fff;
+      font-size: 11px; padding: 2px 6px; border-radius: 4px;
+    }
+    .map-overlay {
+      position: absolute; top: 12px; left: 12px; right: 12px;
+      display: flex; gap: 8px; flex-wrap: wrap;
+      pointer-events: none;
+    }
+    .map-pill {
+      background: rgba(255,255,255,0.95);
+      border: 1px solid var(--border);
+      padding: 5px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+      pointer-events: auto;
+    }
+
+    /* Lists / Tables */
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .list-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      transition: border-color .15s;
+    }
+    .list-item:hover { border-color: var(--border); }
+    .list-meta { display: flex; flex-direction: column; gap: 2px; }
+    .list-title { font-weight: 500; font-size: 13px; }
+    .list-desc { font-size: 12px; color: var(--text-secondary); }
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 8px; border-radius: 12px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-blue { background: var(--primary-light); color: var(--primary); }
+    .badge-green { background: #eafaf1; color: var(--success); }
+    .badge-orange { background: #fff7e6; color: var(--warning); }
+    .badge-red { background: #ffebeb; color: var(--danger); }
+    .badge-gray { background: var(--surface); color: var(--text-secondary); }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 6px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Quick actions */
+    .quick-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .stat-row { display: flex; gap: 24px; margin-top: 12px; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 18px; font-weight: 700; }
+    .stat-name { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* Modal */
+    .modal {
+      display: none; place-items: center;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 200;
+    }
+    .modal.open { display: grid; }
+    .modal-content {
+      background: var(--bg);
+      border-radius: var(--radius);
+      width: 460px; max-width: 92%;
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+    }
+    .modal-content h3 { margin: 0 0 16px; font-size: 17px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .key-status { font-size: 12px; margin-top: 6px; }
+    .key-status.ok { color: var(--success); }
+    .key-status.missing { color: var(--text-secondary); }
+
+    /* Utility */
+    .hidden { display: none !important; }
+    .text-secondary { color: var(--text-secondary); }
+    .mt-16 { margin-top: 16px; }
+    .empty-state {
+      text-align: center; padding: 40px 20px; color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <h1>贵州枢纽 <span>低空智慧物流平台</span></h1>
+    </div>
+    <nav class="role-tabs" id="roleTabs">
+      <button data-role="merchant" class="active">商家端</button>
+      <button data-role="pilot">飞手端</button>
+      <button data-role="customer">客户端</button>
+      <button data-role="operator">运营端</button>
+    </nav>
+    <div class="actions">
+      <button class="btn btn-ghost" id="keyConfigBtn">地图Key配置</button>
+      <div class="user">A</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main" id="main"></main>
+  </div>
+
+  <div class="modal" id="keyModal">
+    <div class="modal-content">
+      <h3>高德地图密钥配置</h3>
+      <div class="form-group">
+        <label for="webKey">Web 端 Key（前端地图）</label>
+        <input type="text" id="webKey" placeholder="请输入高德 Web 端 Key">
+        <div class="key-status" id="webKeyStatus">未配置</div>
+      </div>
+      <div class="form-group">
+        <label for="serviceKey">Web 服务 Key（后端能力）</label>
+        <input type="text" id="serviceKey" placeholder="请输入高德 Web 服务 Key">
+        <div class="key-status" id="serviceKeyStatus">未配置</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="closeModal">取消</button>
+        <button class="btn btn-primary" id="saveKeys">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===================== State =====================
+    const state = {
+      role: 'merchant',
+      subPage: 'dashboard',
+      keys: {
+        web: localStorage.getItem('amap_web_key') || '',
+        service: localStorage.getItem('amap_service_key') || ''
+      },
+      mapLoaded: false
+    };
+
+    const roles = {
+      merchant: {
+        label: '商家端',
+        menu: [
+          { id: 'dashboard', label: '数据看板', icon: 'chart' },
+          { id: 'orders', label: '下单管理', icon: 'box' },
+          { id: 'tracking', label: '全链路追踪', icon: 'map' },
+          { id: 'billing', label: '对账结算', icon: 'receipt' }
+        ]
+      },
+      pilot: {
+        label: '飞手端',
+        menu: [
+          { id: 'hall', label: '抢单大厅', icon: 'bolt' },
+          { id: 'nav', label: '航线导航', icon: 'map' },
+          { id: 'earnings', label: '收益明细', icon: 'wallet' },
+          { id: 'certs', label: '资质管理', icon: 'shield' }
+        ]
+      },
+      customer: {
+        label: '客户端',
+        menu: [
+          { id: 'scan', label: '扫码查件', icon: 'scan' },
+          { id: 'track', label: '实时轨迹', icon: 'route' },
+          { id: 'receive', label: '收货确认', icon: 'check' },
+          { id: 'claims', label: '售后理赔', icon: 'headphones' }
+        ]
+      },
+      operator: {
+        label: '运营端',
+        menu: [
+          { id: 'dispatch', label: '全域调度大屏', icon: 'monitor' },
+          { id: 'airspace', label: '航线空域管理', icon: 'layers' },
+          { id: 'compliance', label: '准入合规', icon: 'clipboard' },
+          { id: 'finance', label: '财务结算', icon: 'receipt' },
+          { id: 'arbitration', label: '纠纷仲裁', icon: 'gavel' },
+          { id: 'statistics', label: '数据统计', icon: 'bar' }
+        ]
+      }
+    };
+
+    // ===================== Icons (inline SVG) =====================
+    const icons = {
+      chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
+      box: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+      map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+      receipt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><path d="M16 8h-6"/><path d="M16 12h-6"/><path d="M16 16h-6"/></svg>',
+      bolt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5"/><path d="M16 12h6"/></svg>',
+      shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
+      route: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>',
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+      headphones: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+      monitor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+      layers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
+      clipboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
+      gavel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><path d="M14 13l-8.5 8.5a2.12 2.12 0 0 1-3-3L11 10"/><path d="M16 16l6-6"/><path d="M8 8l6-6"/><path d="M9 7l8 8"/><path d="M21 11l-8-8"/></svg>',
+      bar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>'
+    };
+
+    // ===================== Helpers =====================
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
+
+    function initMap(id, opts = {}) {
+      const container = document.getElementById(id);
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (state.keys.web && window.AMap) {
+        try {
+          const map = new AMap.Map(id, {
+            zoom: 11,
+            center: [106.63, 26.65], // Guiyang
+            mapStyle: 'amap://styles/normal'
+          });
+          if (opts.markers) {
+            opts.markers.forEach(m => {
+              new AMap.Marker({ position: m.pos, title: m.title, map });
+            });
+          }
+          return map;
+        } catch (e) {
+          console.error('AMap init failed', e);
+        }
+      }
+
+      // Fallback mock map
+      const mock = document.createElement('div');
+      mock.className = 'mock-map';
+      if (opts.markers) {
+        opts.markers.forEach(m => {
+          const el = document.createElement('div');
+          el.className = 'map-marker';
+          el.style.left = m.left || '50%';
+          el.style.top = m.top || '50%';
+          el.setAttribute('data-label', m.title);
+          mock.appendChild(el);
+        });
+      }
+      container.appendChild(mock);
+    }
+
+    function loadAMapScript() {
+      if (state.mapLoaded || !state.keys.web) return;
+      const script = document.createElement('script');
+      script.src = `https://webapi.amap.com/maps?v=2.0&key=${state.keys.web}`;
+      script.onerror = () => { state.mapLoaded = false; };
+      document.head.appendChild(script);
+      state.mapLoaded = true;
+    }
+
+    // ===================== Renderers =====================
+    function renderSidebar() {
+      const cfg = roles[state.role];
+      $('#sidebar').innerHTML = `
+        <div class="sidebar-label">${cfg.label}功能</div>
+        ${cfg.menu.map(m => `
+          <div class="menu-item ${state.subPage === m.id ? 'active' : ''}" data-page="${m.id}">
+            ${icons[m.icon] || icons.box}
+            <span>${m.label}</span>
+          </div>
+        `).join('')}
+      `;
+      $$('#sidebar .menu-item').forEach(el => {
+        el.addEventListener('click', () => {
+          state.subPage = el.dataset.page;
+          renderSidebar();
+          renderMain();
+        });
+      });
+    }
+
+    function renderMain() {
+      const fn = views[state.role]?.[state.subPage] || views.merchant.dashboard;
+      $('#main').innerHTML = fn();
+      setTimeout(() => {
+        const mapId = document.querySelector('[id^="map-"]')?.id;
+        if (mapId) initMap(mapId, mapConfigs[mapId]);
+      }, 0);
+    }
+
+    const mapConfigs = {
+      'map-tracking': { markers: [{ title: '贵阳龙洞堡枢纽', left: '45%', top: '42%' }, { title: '遵义分拣中心', left: '62%', top: '28%' }] },
+      'map-nav': { markers: [{ title: '起飞点', left: '40%', top: '55%' }, { title: '目的地', left: '65%', top: '35%' }] },
+      'map-track': { markers: [{ title: '无人机当前位置', left: '52%', top: '48%' }] },
+      'map-dispatch': { markers: [{ title: 'A 机队', left: '35%', top: '40%' }, { title: 'B 机队', left: '60%', top: '50%' }, { title: 'C 机队', left: '50%', top: '65%' }] }
+    };
+
+    const views = {
+      merchant: {
+        dashboard: () => `
+          <h2 class="page-title">商家数据看板</h2>
+          <p class="page-sub">今日物流概览 · 贵州枢纽实时数据</p>
+          <div class="grid grid-4" style="margin-bottom:16px;">
+            <div class="card kpi"><div class="kpi-label">今日订单</div><div class="kpi-value">1,248</div><div class="kpi-change">↑ 12.5% 较昨日</div></div>
+            <div class="card kpi"><div class="kpi-label">在途包裹</div><div class="kpi-value">386</div><div class="kpi-change">↑ 5.2% 较昨日</div></div>
+            <div class="card kpi"><div class="kpi-label">妥投率</div><div class="kpi-value">98.6%</div><div class="kpi-change">↑ 0.3% 较昨日</div></div>
+            <div class="card kpi"><div class="kpi-label">异常订单</div><div class="kpi-value">7</div><div class="kpi-change down">需关注</div></div>
+          </div>
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">本周发货趋势</h3><span class="card-action">查看详情</span></div>
+              <div class="stat-row">
+                <div class="stat"><div class="stat-num">8,420</div><div class="stat-name">本周订单</div></div>
+                <div class="stat"><div class="stat-num">6,311</div><div class="stat-name">已完成</div></div>
+                <div class="stat"><div class="stat-num">¥42.6w</div><div class="stat-name">运费支出</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">待处理事项</h3><span class="card-action">全部标为已读</span></div>
+              <div class="list">
+                <div class="list-item"><div class="list-meta"><div class="list-title">3 笔订单待发货</div><div class="list-desc">建议 18:00 前完成揽收</div></div><span class="badge badge-orange">待处理</span></div>
+                <div class="list-item"><div class="list-meta"><div class="list-title">1 笔对账差异待复核</div><div class="list-desc">差异金额 ¥126.00</div></div><span class="badge badge-blue">去复核</span></div>
+                <div class="list-item"><div class="list-meta"><div class="list-title">月度结算单已生成</div><div class="list-desc">9 月运费明细可下载</div></div><span class="badge badge-green">已生成</span></div>
+              </div>
+            </div>
+          </div>
+        `,
+        orders: () => `
+          <h2 class="page-title">下单管理</h2>
+          <p class="page-sub">批量下单 · 应急单 · 订单追踪，一键触达</p>
+          <div class="quick-actions">
+            <button class="btn btn-primary" onclick="alert('打开批量下单弹窗')">+ 批量下单</button>
+            <button class="btn" style="border-color:var(--warning);color:var(--warning);" onclick="alert('打开应急单通道')">⚡ 应急快单</button>
+            <button class="btn">导入 Excel</button>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3 class="card-title">最近订单</h3><span class="card-action">导出明细</span></div>
+            <div class="list">
+              <div class="list-item"><div class="list-meta"><div class="list-title">ORD-20261007-001</div><div class="list-desc">贵阳 → 遵义 · 2.3kg · 标快</div></div><span class="badge badge-blue">运输中</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">ORD-20261007-002</div><div class="list-desc">贵阳 → 安顺 · 0.8kg · 急件</div></div><span class="badge badge-orange">待揽收</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">ORD-20261007-003</div><div class="list-desc">贵阳 → 凯里 · 5.1kg · 冷链</div></div><span class="badge badge-green">已签收</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">ORD-20261007-004</div><div class="list-desc">贵阳 → 六盘水 · 1.2kg · 标快</div></div><span class="badge badge-blue">运输中</span></div>
+            </div>
+          </div>
+        `,
+        tracking: () => `
+          <h2 class="page-title">全链路追踪</h2>
+          <p class="page-sub">高德地图实时可视化 · 无人机 + 地面节点全程可溯</p>
+          <div class="card map-card">
+            <div class="map-overlay">
+              <span class="map-pill">实时刷新</span>
+              <span class="map-pill">GPS 在线</span>
+              <span class="map-pill">预计 18:32 到达</span>
+            </div>
+            <div id="map-tracking" class="map-container"></div>
+          </div>
+        `,
+        billing: () => `
+          <h2 class="page-title">对账结算</h2>
+          <p class="page-sub">运费明细 · 发票管理 · 自动核销</p>
+          <div class="grid grid-3" style="margin-bottom:16px;">
+            <div class="card kpi"><div class="kpi-label">本月应付</div><div class="kpi-value">¥42,680</div></div>
+            <div class="card kpi"><div class="kpi-label">已开票</div><div class="kpi-value">¥31,200</div></div>
+            <div class="card kpi"><div class="kpi-label">待核销</div><div class="kpi-value">¥11,480</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3 class="card-title">结算账单</h3><span class="card-action">申请开票</span></div>
+            <div class="list">
+              <div class="list-item"><div class="list-meta"><div class="list-title">2026-09 月度运费账单</div><div class="list-desc">周期：9.1 - 9.30 · 订单 2,834 笔</div></div><span class="badge badge-green">已结清</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">2026-10 上半月账单</div><div class="list-desc">周期：10.1 - 10.15 · 订单 1,421 笔</div></div><span class="badge badge-orange">待确认</span></div>
+            </div>
+          </div>
+        `
+      },
+      pilot: {
+        hall: () => `
+          <h2 class="page-title">抢单大厅</h2>
+          <p class="page-sub">附近可接订单 · 智能派单推荐</p>
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">推荐订单</h3><span class="map-pill" style="background:var(--primary-light);color:var(--primary);">智能派单</span></div>
+              <div class="list">
+                <div class="list-item">
+                  <div class="list-meta"><div class="list-title">贵阳观山湖 → 花溪</div><div class="list-desc">12km · 1.2kg · 赏金 ¥28</div></div>
+                  <button class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="this.textContent='已抢';this.disabled=true;this.style.opacity='0.6'">抢单</button>
+                </div>
+                <div class="list-item">
+                  <div class="list-meta"><div class="list-title">贵阳龙洞堡 → 清镇</div><div class="list-desc">28km · 0.8kg · 赏金 ¥45</div></div>
+                  <button class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="this.textContent='已抢';this.disabled=true;this.style.opacity='0.6'">抢单</button>
+                </div>
+                <div class="list-item">
+                  <div class="list-meta"><div class="list-title">遵义汇川 → 红花岗</div><div class="list-desc">9km · 2.5kg · 赏金 ¥32</div></div>
+                  <button class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="this.textContent='已抢';this.disabled=true;this.style.opacity='0.6'">抢单</button>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">我的任务</h3><span class="card-action">查看全部</span></div>
+              <div class="list">
+                <div class="list-item"><div class="list-meta"><div class="list-title">PKT-11032 运输中</div><div class="list-desc">预计 19:05 送达 · 剩余 6km</div></div><span class="badge badge-blue">执行中</span></div>
+                <div class="list-item"><div class="list-meta"><div class="list-title">PKT-11028 已送达</div><div class="list-desc">今日 16:40 签收</div></div><span class="badge badge-green">已完成</span></div>
+              </div>
+            </div>
+          </div>
+        `,
+        nav: () => `
+          <h2 class="page-title">航线导航</h2>
+          <p class="page-sub">高德航线规划 · 禁飞区避让 · 实时气象</p>
+          <div class="card map-card">
+            <div class="map-overlay">
+              <span class="map-pill">当前任务：PKT-11032</span>
+              <span class="map-pill">航程 12km</span>
+              <span class="map-pill">风速 3.2m/s</span>
+            </div>
+            <div id="map-nav" class="map-container"></div>
+          </div>
+        `,
+        earnings: () => `
+          <h2 class="page-title">收益明细</h2>
+          <p class="page-sub">任务收入 · 奖励 · 提现</p>
+          <div class="grid grid-4" style="margin-bottom:16px;">
+            <div class="card kpi"><div class="kpi-label">今日收入</div><div class="kpi-value">¥326</div></div>
+            <div class="card kpi"><div class="kpi-label">本周收入</div><div class="kpi-value">¥2,180</div></div>
+            <div class="card kpi"><div class="kpi-label">本月收入</div><div class="kpi-value">¥9,640</div></div>
+            <div class="card kpi"><div class="kpi-label">可提现</div><div class="kpi-value">¥4,200</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3 class="card-title">近期明细</h3><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">立即提现</button></div>
+            <div class="list">
+              <div class="list-item"><div class="list-meta"><div class="list-title">PKT-11028 配送完成</div><div class="list-desc">10-07 16:40</div></div><span class="badge badge-green">+¥28</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">PKT-11025 配送完成</div><div class="list-desc">10-07 14:22</div></div><span class="badge badge-green">+¥34</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">全勤奖励</div><div class="list-desc">10-06 发放</div></div><span class="badge badge-blue">+¥200</span></div>
+            </div>
+          </div>
+        `,
+        certs: () => `
+          <h2 class="page-title">资质管理</h2>
+          <p class="page-sub">执照 · 保险 · 培训记录 · 年审状态</p>
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">我的资质</h3><span class="card-action">上传更新</span></div>
+              <div class="list">
+                <div class="list-item"><div class="list-meta"><div class="list-title">民用无人机驾驶员执照</div><div class="list-desc">AOPA · 多旋翼 III 类</div></div><span class="badge badge-green">有效</span></div>
+                <div class="list-item"><div class="list-meta"><div class="list-title">第三者责任险</div><div class="list-desc">保额 ¥100 万 · 至 2027-03</div></div><span class="badge badge-green">有效</span></div>
+                <div class="list-item"><div class="list-meta"><div class="list-title">年度安全培训</div><div class="list-desc">2026 年度 · 8 课时</div></div><span class="badge badge-blue">已完成</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">即将到期</h3><span class="card-action">一键续期</span></div>
+              <div class="list">
+                <div class="list-item"><div class="list-meta"><div class="list-title">无人机适航证</div><div class="list-desc">到期日：2026-12-15</div></div><span class="badge badge-orange">60 天后</span></div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      customer: {
+        scan: () => `
+          <h2 class="page-title">扫码查件</h2>
+          <p class="page-sub">扫一扫或输入运单号，立即查询物流状态</p>
+          <div class="grid grid-2">
+            <div class="card" style="text-align:center;padding:40px;">
+              <div style="width:160px;height:160px;margin:0 auto 20px;background:var(--surface);border-radius:12px;display:grid;place-items:center;border:2px dashed var(--border);">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>
+              </div>
+              <button class="btn btn-primary" style="padding:10px 24px;" onclick="alert('调用摄像头扫码')">打开摄像头扫码</button>
+              <p class="text-secondary" style="margin-top:12px;font-size:12px;">支持微信 / 支付宝 / 浏览器扫码</p>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">运单号查询</h3></div>
+              <div class="form-group">
+                <label>请输入运单号</label>
+                <input type="text" placeholder="例如：PKT-20261007-001">
+              </div>
+              <button class="btn btn-primary" style="width:100%;" onclick="alert('查询结果：运输中')">查询</button>
+              <div class="list mt-16">
+                <div class="list-item"><div class="list-meta"><div class="list-title">已签收</div><div class="list-desc">PKT-20261005-002 · 10-05 14:30</div></div><span class="badge badge-green">完成</span></div>
+                <div class="list-item"><div class="list-meta"><div class="list-title">运输中</div><div class="list-desc">PKT-20261007-001 · 预计今日到达</div></div><span class="badge badge-blue">在途</span></div>
+              </div>
+            </div>
+          </div>
+        `,
+        track: () => `
+          <h2 class="page-title">实时轨迹</h2>
+          <p class="page-sub">包裹当前位置 · 预计送达时间</p>
+          <div class="card map-card">
+            <div class="map-overlay">
+              <span class="map-pill">运单 PKT-20261007-001</span>
+              <span class="map-pill">预计 18:32 送达</span>
+            </div>
+            <div id="map-track" class="map-container"></div>
+          </div>
+        `,
+        receive: () => `
+          <h2 class="page-title">收货确认</h2>
+          <p class="page-sub">待签收包裹 · 电子签名 · 拍照回执</p>
+          <div class="card">
+            <div class="list">
+              <div class="list-item">
+                <div class="list-meta"><div class="list-title">PKT-20261007-001</div><div class="list-desc">无人机已降落 · 请确认收货</div></div>
+                <button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="alert('收货确认成功')">确认收货</button>
+              </div>
+              <div class="list-item">
+                <div class="list-meta"><div class="list-title">PKT-20261006-089</div><div class="list-desc">已放入智能柜 · 取件码 8823</div></div>
+                <button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="alert('收货确认成功')">确认收货</button>
+              </div>
+            </div>
+          </div>
+        `,
+        claims: () => `
+          <h2 class="page-title">售后理赔</h2>
+          <p class="page-sub">延误 / 丢失 / 破损 · 在线提交理赔申请</p>
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">提交理赔</h3></div>
+              <div class="form-group">
+                <label>运单号</label>
+                <input type="text" placeholder="PKT-20261007-001">
+              </div>
+              <div class="form-group">
+                <label>理赔类型</label>
+                <select><option>货物破损</option><option>货物丢失</option><option>配送延误</option><option>其他</option></select>
+              </div>
+              <div class="form-group">
+                <label>问题描述</label>
+                <textarea rows="3" placeholder="请简要描述问题"></textarea>
+              </div>
+              <button class="btn btn-primary" style="width:100%;" onclick="alert('理赔申请已提交')">提交申请</button>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3 class="card-title">我的理赔</h3></div>
+              <div class="list">
+                <div class="list-item"><div class="list-meta"><div class="list-title">PKT-20260928-034</div><div class="list-desc">破损 · 申请金额 ¥120</div></div><span class="badge badge-green">已赔付</span></div>
+                <div class="list-item"><div class="list-meta"><div class="list-title">PKT-20261002-112</div><div class="list-desc">延误 · 申请金额 ¥15</div></div><span class="badge badge-blue">处理中</span></div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      operator: {
+        dispatch: () => `
+          <h2 class="page-title">全域调度大屏</h2>
+          <p class="page-sub">无人机机队 · 飞手 · 订单 · 实时态势</p>
+          <div class="grid grid-4" style="margin-bottom:16px;">
+            <div class="card kpi"><div class="kpi-label">在线无人机</div><div class="kpi-value">86</div><div class="kpi-change">执行中 62</div></div>
+            <div class="card kpi"><div class="kpi-label">在线飞手</div><div class="kpi-value">124</div><div class="kpi-change">空闲 38</div></div>
+            <div class="card kpi"><div class="kpi-label">今日订单</div><div class="kpi-value">3,842</div><div class="kpi-change">↑ 8.4%</div></div>
+            <div class="card kpi"><div class="kpi-label">异常告警</div><div class="kpi-value">2</div><div class="kpi-change down">低电量 2</div></div>
+          </div>
+          <div class="card map-card">
+            <div class="map-overlay">
+              <span class="map-pill">实时刷新</span>
+              <span class="map-pill">86 架在线</span>
+              <span class="map-pill">2 个预警</span>
+            </div>
+            <div id="map-dispatch" class="map-container"></div>
+          </div>
+        `,
+        airspace: () => `
+          <h2 class="page-title">航线空域管理</h2>
+          <p class="page-sub">航线规划 · 禁飞区 · 审批状态</p>
+          <div class="quick-actions">
+            <button class="btn btn-primary" onclick="alert('打开航线规划')">+ 新增航线</button>
+            <button class="btn">导入空域</button>
+          </div>
+          <div class="card">
+            <div class="list">
+              <div class="list-item"><div class="list-meta"><div class="list-title">GY-ZY-001 贵阳-遵义主线</div><div class="list-desc">全长 148km · 6 个起降点</div></div><span class="badge badge-green">已启用</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">GY-AS-002 贵阳-安顺支线</div><div class="list-desc">全长 92km · 4 个起降点</div></div><span class="badge badge-green">已启用</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">GY-LP-003 贵阳-六盘水冷链</div><div class="list-desc">全长 210km · 8 个起降点</div></div><span class="badge badge-orange">审批中</span></div>
+            </div>
+          </div>
+        `,
+        compliance: () => `
+          <h2 class="page-title">准入合规</h2>
+          <p class="page-sub">企业 / 飞手 / 无人机准入审核</p>
+          <div class="grid grid-3" style="margin-bottom:16px;">
+            <div class="card kpi"><div class="kpi-label">待审核企业</div><div class="kpi-value">5</div></div>
+            <div class="card kpi"><div class="kpi-label">待审核飞手</div><div class="kpi-value">12</div></div>
+            <div class="card kpi"><div class="kpi-label">待审核无人机</div><div class="kpi-value">8</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3 class="card-title">待审核列表</h3><span class="card-action">批量通过</span></div>
+            <div class="list">
+              <div class="list-item"><div class="list-meta"><div class="list-title">贵州云递科技</div><div class="list-desc">企业入驻 · 提交于 10-07 14:20</div></div><span class="badge badge-blue">去审核</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">飞手 张 *</div><div class="list-desc">执照核验 · 提交于 10-07 13:55</div></div><span class="badge badge-blue">去审核</span></div>
+            </div>
+          </div>
+        `,
+        finance: () => `
+          <h2 class="page-title">财务结算</h2>
+          <p class="page-sub">平台流水 · 分账 · 发票 · 结算单</p>
+          <div class="grid grid-4" style="margin-bottom:16px;">
+            <div class="card kpi"><div class="kpi-label">今日流水</div><div class="kpi-value">¥68,420</div></div>
+            <div class="card kpi"><div class="kpi-label">待分账</div><div class="kpi-value">¥23,100</div></div>
+            <div class="card kpi"><div class="kpi-label">已结算</div><div class="kpi-value">¥41,300</div></div>
+            <div class="card kpi"><div class="kpi-label">发票待开</div><div class="kpi-value">¥18,900</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3 class="card-title">结算审批</h3><span class="card-action">全部导出</span></div>
+            <div class="list">
+              <div class="list-item"><div class="list-meta"><div class="list-title">飞手周结批次 #42</div><div class="list-desc">应付 ¥124,600 · 56 人</div></div><span class="badge badge-orange">待审批</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">商家月结批次 #10</div><div class="list-desc">应收 ¥426,800 · 128 家</div></div><span class="badge badge-green">已核销</span></div>
+            </div>
+          </div>
+        `,
+        arbitration: () => `
+          <h2 class="page-title">纠纷仲裁</h2>
+          <p class="page-sub">投诉处理 · 责任判定 · 赔付裁定</p>
+          <div class="grid grid-3" style="margin-bottom:16px;">
+            <div class="card kpi"><div class="kpi-label">待处理</div><div class="kpi-value">6</div></div>
+            <div class="card kpi"><div class="kpi-label">处理中</div><div class="kpi-value">3</div></div>
+            <div class="card kpi"><div class="kpi-label">本月结案</div><div class="kpi-value">28</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3 class="card-title">待处理纠纷</h3><span class="card-action">仲裁规则</span></div>
+            <div class="list">
+              <div class="list-item"><div class="list-meta"><div class="list-title">CASE-20261007-001</div><div class="list-desc">货物破损争议 · 金额 ¥860</div></div><span class="badge badge-orange">待举证</span></div>
+              <div class="list-item"><div class="list-meta"><div class="list-title">CASE-20261006-018</div><div class="list-desc">配送延误索赔 · 金额 ¥120</div></div><span class="badge badge-blue">调解中</span></div>
+            </div>
+          </div>
+        `,
+        statistics: () => `
+          <h2 class="page-title">数据统计</h2>
+          <p class="page-sub">业务数据 · 运营效率 · 服务质量</p>
+          <div class="grid grid-4" style="margin-bottom:16px;">
+            <div class="card kpi"><div class="kpi-label">累计订单</div><div class="kpi-value">128.6w</div></div>
+            <div class="card kpi"><div class="kpi-label">平均时效</div><div class="kpi-value">2.4h</div></div>
+            <div class="card kpi"><div class="kpi-label">投诉率</div><div class="kpi-value">0.08%</div></div>
+            <div class="card kpi"><div class="kpi-label">NPS</div><div class="kpi-value">72</div></div>
+          </div>
+          <div class="grid grid-2">
+            <div class="card"><div class="card-header"><h3 class="card-title">月度订单量</h3><span class="card-action">导出</span></div><div class="empty-state">图表占位 · 可接入 ECharts / AntV</div></div>
+            <div class="card"><div class="card-header"><h3 class="card-title">区域配送热力</h3><span class="card-action">导出</span></div><div class="empty-state">图表占位 · 可接入 ECharts / AntV</div></div>
+          </div>
+        `
+      }
+    };
+
+    // ===================== Events =====================
+    $('#roleTabs').addEventListener('click', (e) => {
+      if (e.target.dataset.role) {
+        state.role = e.target.dataset.role;
+        state.subPage = roles[state.role].menu[0].id;
+        $$('#roleTabs button').forEach(b => b.classList.toggle('active', b.dataset.role === state.role));
+        renderSidebar();
+        renderMain();
+      }
+    });
+
+    // Key config modal
+    const modal = $('#keyModal');
+    $('#keyConfigBtn').addEventListener('click', () => {
+      $('#webKey').value = state.keys.web;
+      $('#serviceKey').value = state.keys.service;
+      updateKeyStatus();
+      modal.classList.add('open');
+    });
+    $('#closeModal').addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+    $('#saveKeys').addEventListener('click', () => {
+      state.keys.web = $('#webKey').value.trim();
+      state.keys.service = $('#serviceKey').value.trim();
+      localStorage.setItem('amap_web_key', state.keys.web);
+      localStorage.setItem('amap_service_key', state.keys.service);
+      updateKeyStatus();
+      if (state.keys.web) loadAMapScript();
+      modal.classList.remove('open');
+      renderMain();
+    });
+
+    function updateKeyStatus() {
+      $('#webKeyStatus').textContent = state.keys.web ? '已配置' : '未配置';
+      $('#webKeyStatus').className = 'key-status ' + (state.keys.web ? 'ok' : 'missing');
+      $('#serviceKeyStatus').textContent = state.keys.service ? '已配置' : '未配置';
+      $('#serviceKeyStatus').className = 'key-status ' + (state.keys.service ? 'ok' : 'missing');
+    }
+
+    // ===================== Init =====================
+    renderSidebar();
+    renderMain();
+    loadAMapScript();
+  </script>
+</body>
+</html>
